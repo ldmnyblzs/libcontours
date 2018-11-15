@@ -1,0 +1,69 @@
+#ifndef MERGE_EQUAL_VERTICES_HPP
+#define MERGE_EQUAL_VERTICES_HPP 1
+
+#include <boost/graph/graph_traits.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <deque>
+#include <vector>
+#include <boost/range/algorithm/find.hpp>
+
+namespace shape {
+  template <typename Graph, typename EdgeProperty>
+static void
+add_edge_unique(const typename boost::graph_traits<Graph>::vertex_descriptor &source,
+                const typename boost::graph_traits<Graph>::vertex_descriptor &target,
+		const EdgeProperty &property,
+                Graph &graph) {
+  if (!edge(source, target, graph).second)
+    add_edge(source, target, property, graph);
+}
+
+template <typename Graph, typename EqualVerticesMap, typename AreaMap,
+          typename VisitedMap>
+void merge_equal_vertices(Graph &graph, EqualVerticesMap &equal, AreaMap &area,
+                          VisitedMap &visited) {
+  using namespace std;
+  using namespace boost;
+  using namespace boost::adaptors;
+  using Vertex = typename graph_traits<Graph>::vertex_descriptor;
+  
+  for (const auto vertex : make_iterator_range(vertices(graph))) {
+    if (!get(visited, vertex)) {
+      visited[vertex] = true;
+      deque<Vertex> equal_vertices(equal[vertex].cbegin(), equal[vertex].cend());
+
+      while (!equal_vertices.empty()) {
+        if (!get(visited, equal_vertices.front())) {
+          visited[equal_vertices.front()] = true;
+
+          for (const auto edge :
+               make_iterator_range(out_edges(equal_vertices.front(), graph)))
+            add_edge_unique(vertex, target(edge, graph), get(edge_all, graph, edge), graph);
+          for (const auto edge :
+               make_iterator_range(in_edges(equal_vertices.front(), graph)))
+            add_edge_unique(source(edge, graph), vertex, get(edge_all, graph, edge), graph);
+
+	  clear_vertex(equal_vertices.front(), graph);
+          area[vertex] += get(area, equal_vertices.front());
+          for (const auto eq : equal[equal_vertices.front()])
+	    if (!get(visited, eq))
+	      equal_vertices.push_back(eq);
+        }
+	equal_vertices.pop_front();
+      }
+    }
+  }
+
+  vector<Vertex> to_remove;
+  for (const auto vertex : make_iterator_range(vertices(graph))) {
+    if (degree(vertex, graph) == 0)
+      to_remove.push_back(vertex);
+  }
+
+  for (const auto vertex : reverse(to_remove))
+    remove_vertex(vertex, graph);
+}
+}; // namespace shape
+
+#endif // MERGE_EQUAL_VERTICES_HPP
