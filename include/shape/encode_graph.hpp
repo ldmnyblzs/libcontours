@@ -1,7 +1,7 @@
 #ifndef ENCODE_GRAPH_HPP
 #define ENCODE_GRAPH_HPP 1
 
-#include <bliss/graph.hh>
+#include <bliss-0.73/graph.hh>
 #include <boost/container/static_vector.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/johnson_all_pairs_shortest.hpp>

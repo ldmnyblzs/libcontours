@@ -10,15 +10,15 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <iostream>
 
-#include "discover_graph.hpp"
-#include "find_equilibra.hpp"
-#include "intersect_faces.hpp"
-#include "intersect_halfedges.hpp"
-#include "merge_equal_vertices.hpp"
-#include "mesh_properties.hpp"
-#include "stl_io.hpp"
-#include "make_reeb.hpp"
-#include "encode_graph.hpp"
+#include "shape/discover_graph.hpp"
+#include "shape/find_equilibra.hpp"
+#include "shape/intersect_faces.hpp"
+#include "shape/intersect_halfedges.hpp"
+#include "shape/merge_equal_vertices.hpp"
+#include "shape/mesh_properties.hpp"
+#include "shape/stl_io.hpp"
+#include "shape/make_reeb.hpp"
+#include "shape/encode_graph.hpp"
 
 using Kernel = CGAL::Simple_cartesian<double>;
 using Point = Kernel::Point_3;
