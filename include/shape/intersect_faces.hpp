@@ -10,6 +10,7 @@
 #include <boost/range/irange.hpp>
 #include <map>
 #include <optional>
+#include "util.hpp"
 
 namespace shape {
 template <typename Point, typename Vector>
