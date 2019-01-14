@@ -50,6 +50,18 @@ auto surface_area(const Mesh &mesh, const PointMap &point) {
         return init + sqrt(face_triangle(mesh, point, face).squared_area());
       });
 }
+
+template <typename Mesh, typename PointMap, typename Point>
+auto volume(const Mesh &mesh, const PointMap &point, const Point &centroid) {
+  using namespace boost;
+  using namespace CGAL;
+  return accumulate(faces(mesh), 0.0, [&](const auto init, const auto face) {
+    const auto h = halfedge(face, mesh);
+    return init + abs(volume(centroid, get(point, source(h, mesh)),
+                             get(point, target(h, mesh)),
+                             get(point, target(next(h, mesh), mesh))));
+  });
+}
 }; // namespace shape
 
 #endif // MESH_PROPERTIES_HPP

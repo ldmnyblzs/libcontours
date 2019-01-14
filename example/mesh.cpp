@@ -22,6 +22,7 @@
 
 using Kernel = CGAL::Simple_cartesian<double>;
 using Point = Kernel::Point_3;
+using Vector = Kernel::Vector_3;
 using Mesh = CGAL::Surface_mesh<Point>;
 using Halfedge = Mesh::Halfedge_index;
 
@@ -47,10 +48,24 @@ struct VertexProperty {
   int label;
 };
 
+struct Arc {
+  Point center;
+  Point source;
+  Point target;
+  Vector normal;
+  Arc(Point center, Point source, Point target, Vector normal) :
+    center(std::move(center)),
+    source(std::move(source)),
+    target(std::move(target)),
+    normal(std::move(normal)) {
+  }
+};
+
 struct EdgeProperty {
   double area_inside = 0.0, area_outside = 0.0;
   boost::container::flat_set<GraphVertex> roots_inside, roots_outside;
   int level = 0;
+  std::list<Arc> arcs;
 };
 
 int main(int argc, char **argv) {
@@ -88,12 +103,13 @@ int main(int argc, char **argv) {
   auto area_map = boost::get(&VertexProperty::area, graph);
   auto eq_map = boost::get(&VertexProperty::eq_edges, graph);
   auto edge_level = boost::get(&EdgeProperty::level, graph);
+  auto arc_list = boost::get(&EdgeProperty::arcs, graph);
   shape::intersect_faces(mesh, mesh.points(), halfedge_intersections,
                          to_halfedge, from_halfedge, origin, min_distance, step,
-                         graph, area_map, eq_map, edge_level);
+                         graph, area_map, eq_map, edge_level, arc_list);
 
   auto visited_map = boost::get(&VertexProperty::visited, graph);
-  shape::merge_equal_vertices(graph, eq_map, area_map, visited_map);
+  shape::merge_equal_vertices(graph, eq_map, area_map, visited_map, arc_list);
 
   auto area_inside_map = boost::get(&EdgeProperty::area_inside, graph);
   auto roots_inside_map = boost::get(&EdgeProperty::roots_inside, graph);

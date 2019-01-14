@@ -7,22 +7,28 @@
 #include <deque>
 #include <vector>
 #include <boost/range/algorithm/find.hpp>
+#include <boost/property_map/property_map.hpp>
 
 namespace shape {
-  template <typename Graph, typename EdgeProperty>
+  template <typename Graph, typename ArcListMap, typename EdgeProperty>
 static void
 add_edge_unique(const typename boost::graph_traits<Graph>::vertex_descriptor &source,
                 const typename boost::graph_traits<Graph>::vertex_descriptor &target,
+		ArcListMap &arc_list,
+		typename boost::property_traits<ArcListMap>::value_type &other_arcs,
 		const EdgeProperty &property,
                 Graph &graph) {
-  if (!edge(source, target, graph).second)
+  const auto existing = edge(source, target, graph);
+  if (existing.second)
+    arc_list[existing.first].splice(arc_list[existing.first].cend(), other_arcs);
+  else
     add_edge(source, target, property, graph);
 }
 
 template <typename Graph, typename EqualVerticesMap, typename AreaMap,
-          typename VisitedMap>
+          typename VisitedMap, typename ArcListMap>
 void merge_equal_vertices(Graph &graph, EqualVerticesMap &equal, AreaMap &area,
-                          VisitedMap &visited) {
+                          VisitedMap &visited, ArcListMap &arc_list) {
   using namespace std;
   using namespace boost;
   using namespace boost::adaptors;
@@ -39,10 +45,10 @@ void merge_equal_vertices(Graph &graph, EqualVerticesMap &equal, AreaMap &area,
 
           for (const auto edge :
                make_iterator_range(out_edges(equal_vertices.front(), graph)))
-            add_edge_unique(vertex, target(edge, graph), get(edge_all, graph, edge), graph);
+            add_edge_unique(vertex, target(edge, graph), arc_list, get(arc_list, edge), get(edge_all, graph, edge), graph);
           for (const auto edge :
                make_iterator_range(in_edges(equal_vertices.front(), graph)))
-            add_edge_unique(source(edge, graph), vertex, get(edge_all, graph, edge), graph);
+            add_edge_unique(source(edge, graph), vertex, arc_list, get(arc_list, edge), get(edge_all, graph, edge), graph);
 
 	  clear_vertex(equal_vertices.front(), graph);
           area[vertex] += get(area, equal_vertices.front());

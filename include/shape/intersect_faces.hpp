@@ -64,14 +64,14 @@ static constexpr std::array<std::bitset<3>, 3> edge_masks = {0b101, 0b011,
 template <typename Mesh, typename PointMap, typename EdgeIntersectionMap,
           typename HalfedgeVertexMap, typename Point, typename Real,
           typename Graph, typename VertexAreaMap, typename EquivalentMap,
-          typename LevelMap>
+          typename LevelMap, typename ArcListMap>
 void intersect_faces(const Mesh &mesh, const PointMap &point,
                      const EdgeIntersectionMap &intersections,
                      HalfedgeVertexMap &to_halfedge,
                      HalfedgeVertexMap &from_halfedge, const Point &origin,
                      const Real min_distance, const Real step, Graph &graph,
                      VertexAreaMap &area, EquivalentMap &equivalent,
-                     LevelMap &edge_level) {
+                     LevelMap &edge_level, ArcListMap &arc_list) {
   using std::array;
   using std::move;
   using std::optional;
@@ -88,6 +88,8 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
   using iterator =
       typename property_traits<EdgeIntersectionMap>::value_type::const_iterator;
   using GraphVertex = typename graph_traits<Graph>::vertex_descriptor;
+  using ArcList = typename property_traits<ArcListMap>::value_type;
+  using Arc = typename ArcList::value_type;
 
   for (const auto face : faces(mesh)) {
     // get random access to a few things around the face
@@ -210,8 +212,9 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
             area[previous_vertices.at(p)] += area_mod;
             area[current_vertices.at(c)] -= area_mod;
 
-            const auto new_edge = add_edge(previous_vertices[p], current_vertices[c], graph);
-	    put(edge_level, new_edge.first, level);
+            const auto new_edge = add_edge(previous_vertices[p], current_vertices[c], graph).first;
+	    put(edge_level, new_edge, level);
+	    put(arc_list, new_edge, ArcList{Arc(face_center, current_arcs.at(c).first, current_arcs.at(c).second, face_normal)});
 
             if (previous_edges.empty() ||
                 previous_edges.at(p).first != current_edges.at(c).first)
