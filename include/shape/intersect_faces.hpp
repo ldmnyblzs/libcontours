@@ -140,14 +140,19 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
     for (const int level : irange(first_level, min_level)) {
       const Real r = min_distance + level * step;
       const auto new_vertex = add_vertex(graph);
-      const auto new_edge = add_edge(previous_vertices[0], new_vertex, graph);
-      put(edge_level, new_edge.first, level);
+      const auto new_edge = add_edge(previous_vertices[0], new_vertex, graph).first;
+      put(edge_level, new_edge, level);
 
-      const double circle_area =
-          Circle(Sphere(origin, r * r), face_plane).approximate_area();
+      Circle circle(Sphere(origin, r * r), face_plane);
+      const double circle_area = circle.approximate_area();
       area[previous_vertices[0]] += circle_area;
       area[new_vertex] -= circle_area;
       previous_vertices[0] = new_vertex;
+      const auto base = normalize(face_plane.base1()) * sqrt(circle.squared_radius());
+      const auto p1 = face_center + base;
+      const auto p2 = face_center - base;
+      const ArcList arcs{Arc(face_center, p1, p2, face_normal), Arc(face_center, p2, p1, face_normal)};
+      put(arc_list, new_edge, arcs);
     }
 
     previous_covers.push_back(0b111);
