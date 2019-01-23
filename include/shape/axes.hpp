@@ -11,6 +11,8 @@
 
 #include "util.hpp"
 
+namespace shape {
+
 template <typename PointMap>
 std::array<typename CGAL::Kernel_traits<
                typename boost::property_traits<PointMap>::value_type>::Kernel,
@@ -106,5 +108,6 @@ std::pair<double, double> projected_properties(const PointMap &points,
                       });
   return {circumference, outline.area()};
 }
+}; // namespace shape
 
 #endif // AXES_HPP
