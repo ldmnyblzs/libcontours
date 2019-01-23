@@ -15,7 +15,7 @@ namespace shape {
 
 template <typename PointMap>
 std::array<typename CGAL::Kernel_traits<
-               typename boost::property_traits<PointMap>::value_type>::Kernel,
+	     typename boost::property_traits<PointMap>::value_type>::Kernel::Vector_3,
            3>
 axes(const PointMap &points) {
   using Point = typename boost::property_traits<PointMap>::value_type;
