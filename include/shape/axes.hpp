@@ -89,7 +89,7 @@ std::pair<double, double> projected_properties(const PointMap &points,
   const CGAL::Aff_transformation_3<Kernel> new_basis(
       x.x(), x.y(), x.z(), y.x(), y.y(), y.z(), z.x(), z.y(), z.z());
 
-  std::vector<Point> projected_points;
+  std::vector<typename Kernel::Point_2> projected_points;
   projected_points.reserve(boost::size(points));
 
   for (const auto &point : points) {
