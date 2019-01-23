@@ -99,7 +99,7 @@ std::pair<double, double> projected_properties(const PointMap &points,
 
   CGAL::Polygon_2<Kernel> outline;
   CGAL::convex_hull_2(projected_points.cbegin(), projected_points.cend(),
-                      outline);
+                      std::back_inserter(outline));
 
   const auto circumference =
       std::accumulate(outline.edges_begin(), outline.edges_end(), 0.0,
