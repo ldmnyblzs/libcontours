@@ -143,7 +143,7 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
       const auto new_edge = add_edge(previous_vertices[0], new_vertex, graph).first;
       put(edge_level, new_edge, level);
 
-      Circle circle(Sphere(origin, r * r), face_plane);
+      Circle circle(face_center, r * r - squared_distance(origin, face_center), face_normal);
       const double circle_area = circle.approximate_area();
       area[previous_vertices[0]] += circle_area;
       area[new_vertex] -= circle_area;
