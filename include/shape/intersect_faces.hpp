@@ -196,11 +196,11 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
       }
 
       // match up current arcs with previous_arcs
-      for (const auto p : irange(0ul, previous_covers.size())) {
+      for (const auto p : irange<typename vector<bitset<3>>::size_type>(0, previous_covers.size())) {
         const auto to_cover = previous_covers.at(p).count();
         array<int, 3> covers{3, 3, 3};
 
-        for (const auto c : irange(0ul, current_covers.size())) {
+        for (const auto c : irange<typename vector<bitset<3>>::size_type>(0, current_covers.size())) {
           if (is_subset(previous_covers.at(p), current_covers.at(c))) {
             previous_covers.at(p) &= ~current_covers.at(c);
 
@@ -252,7 +252,7 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
         }
         const int start = previous_edges.empty() ? current_edges.at(0).first
 	  : previous_edges.at(p).first;
-        for (const auto i : irange(0ul, to_cover)) {
+        for (const auto i : irange<typename vector<bitset<3>>::size_type>(0, to_cover)) {
           const auto vertex = (start + i) % 3;
           switch (covers[vertex]) {
           case 3:
@@ -280,7 +280,7 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
       previous_vertices = move(current_vertices);
     }
 
-    for (const auto p : irange(0ul, previous_covers.size())) {
+    for (const auto p : irange<typename vector<bitset<3>>::size_type>(0, previous_covers.size())) {
       vector<Point> polygon;
       const auto to_cover = previous_covers.at(p).count();
       if (to_cover != 3) {
@@ -288,7 +288,7 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
         polygon.push_back(previous_arcs.at(p).first);
       }
       const int start = previous_edges.empty() ? 0 : previous_edges.at(p).first;
-      for (const auto i : irange(0ul, to_cover)) {
+      for (const auto i : irange<typename vector<bitset<3>>::size_type>(0, to_cover)) {
         const auto vertex = (start + i) % 3;
         if (previous_covers.at(p)[vertex])
           polygon.push_back(get(point, target(halfedges.at(vertex), mesh)));

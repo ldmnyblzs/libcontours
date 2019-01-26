@@ -8,6 +8,7 @@
 #include <boost/range/irange.hpp>
 #include <regex>
 #include <vector>
+#include <iterator>
 
 #ifndef STL_IO
 #define STL_IO 1
@@ -54,6 +55,7 @@ bool read_STL(Iterator begin, Iterator end, Mesh &mesh, PointMap &points) {
   using vertex = typename boost::graph_traits<Mesh>::vertex_descriptor;
   BOOST_CONCEPT_ASSERT((boost::WritablePropertyMapConcept<PointMap, vertex>));
   using Point = typename boost::property_traits<PointMap>::value_type;
+  using Diff = typename std::iterator_traits<Iterator>::difference_type;
 
   using boost::irange;
   using boost::container::static_vector;
@@ -101,10 +103,10 @@ bool read_STL(Iterator begin, Iterator end, Mesh &mesh, PointMap &points) {
     if (!regex_match(last, end, footer, match_continuous)) {
       return false;
     }
-  } else if (const auto data_size = distance(begin, end);
+  } else if (const Diff data_size = distance(begin, end);
              data_size >= 84 && ((data_size - 84) % STL_TRIANGLE_SIZE) == 0) {
     static_vector<vertex, 3> face_vertices;
-    for (const auto triangle : irange(84l, data_size, STL_TRIANGLE_SIZE)) {
+    for (const auto triangle : irange<Diff>(84l, data_size, STL_TRIANGLE_SIZE)) {
       face_vertices.clear();
       for (const auto v : irange(3, 12, 3)) {
         face_vertices.push_back(
