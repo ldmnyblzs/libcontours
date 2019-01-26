@@ -8,6 +8,7 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <map>
 #include <optional>
 #include "util.hpp"
@@ -16,12 +17,13 @@ namespace shape {
 template <typename Point, typename Vector>
 static auto arc_area(const Point &source, const Point &target,
                      const Vector &normal, const Point &center) {
+  using namespace boost::math::double_constants;
   const auto to_source = source - center;
   const auto to_target = target - center;
   const auto angle =
       atan2(-scalar_product(normal, cross_product(to_source, to_target)),
             -scalar_product(to_source, to_target)) +
-      M_PI;
+      pi;
   return 0.5 * to_source.squared_length() * (angle - sin(angle));
 }
 
