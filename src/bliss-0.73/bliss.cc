@@ -4,7 +4,7 @@
 #include <cassert>
 #include "defs.hh"
 #include "graph.hh"
-#include "timer.hh"
+//#include "timer.hh"
 #include "utils.hh"
 
 /*
@@ -183,7 +183,7 @@ _fatal(const char* fmt, ...)
 int
 main(const int argc, const char** argv)
 {
-  bliss::Timer timer;
+  //bliss::Timer timer;
   bliss::AbstractGraph* g = 0;
 
   parse_options(argc, argv);
@@ -253,11 +253,11 @@ main(const int argc, const char** argv)
   if(!g)
     _fatal("Failed to read the graph, aborting");
   
-  if(verbose_level >= 2)
+  /*if(verbose_level >= 2)
     {
       fprintf(verbstr, "Graph read in %.2f seconds\n", timer.get_duration());
       fflush(verbstr);
-    }
+    }*/
 
 
   bliss::Stats stats;
@@ -303,11 +303,11 @@ main(const int argc, const char** argv)
   if(verbose_level > 0 and verbstr)
     stats.print(verbstr);
 
-  if(verbose_level > 0)
+  /*if(verbose_level > 0)
     {
       fprintf(verbstr, "Total time:\t%.2f seconds\n", timer.get_duration());
       fflush(verbstr);
-    }
+    }*/
 
 
   delete g; g = 0;

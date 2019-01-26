@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "defs.hh"
-#include "timer.hh"
+//#include "timer.hh"
 #include "graph.hh"
 #include "partition.hh"
 #include "utils.hh"
@@ -677,17 +677,17 @@ AbstractGraph::search(const bool canonical, Stats& stats)
    * This saves some cycles. */
   compute_eqref_hash = false;
 
-  Timer timer1;
+  //Timer timer1;
 
   make_initial_equitable_partition();
 
 
-  if(verbstr && verbose_level >= 2)
+  /*if(verbstr && verbose_level >= 2)
     {
       fprintf(verbstr, "Initial partition computed in %.2f seconds\n",
 	      timer1.get_duration());
       fflush(verbstr);
-    }
+    }*/
   
 
 
