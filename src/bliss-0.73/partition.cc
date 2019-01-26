@@ -190,7 +190,7 @@ Partition::goto_backtrack_point(BacktrackPoint p)
 	  assert(cell->prev);
 	  cell = cell->prev;
 	}
-      while(cell->next and
+      while(cell->next &&
 	    cell->next->split_level > dest_refinement_stack_size)
 	{
 	  /* Merge next cell */
@@ -425,7 +425,7 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
   for(unsigned int i = cell->first; i < cell->first + cell->length; i++)
     {
       const unsigned int ival = invariant_values[elements[i]];
-      assert(ival == 0 or ival == 1);
+      assert(ival == 0 || ival == 1);
       if(ival == 0) nof_0_found++;
       else nof_1_found++;
     }
@@ -775,7 +775,7 @@ Partition::shellsort_cell(Partition::Cell* const cell)
       const unsigned int element = ep[i];
       const unsigned int ival = invariant_values[element];
       unsigned int j = i;
-      while(j >= h and invariant_values[ep[j-h]] > ival) {
+      while(j >= h && invariant_values[ep[j-h]] > ival) {
         ep[j] = ep[j-h];
         j -= h;
       }
@@ -833,7 +833,7 @@ Partition::split_cell(Partition::Cell* const original_cell)
       Cell* const new_cell = aux_split_in_two(cell,
 					      (ep - elements) - cell->first);
       
-      if(graph and graph->compute_eqref_hash)
+      if(graph && graph->compute_eqref_hash)
 	{
 	  graph->eqref_hash.update(new_cell->first);
 	  graph->eqref_hash.update(new_cell->length);

@@ -13,7 +13,7 @@ add_library(bliss STATIC
   ${bliss_dir}/orbit.cc
   ${bliss_dir}/uintseqhash.cc
   ${bliss_dir}/heap.cc
-  ${bliss_dir}/timer.cc
+#  ${bliss_dir}/timer.cc
   ${bliss_dir}/utils.cc
   ${bliss_dir}/bliss_C.cc)
 target_include_directories(bliss PUBLIC

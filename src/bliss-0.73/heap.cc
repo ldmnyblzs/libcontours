@@ -55,7 +55,7 @@ void Heap::downheap(unsigned int index)
   while(index <= lim)
     {
       unsigned int new_index = index + index;
-      if((new_index < n) and (array[new_index] > array[new_index+1]))
+      if((new_index < n) && (array[new_index] > array[new_index+1]))
 	new_index++;
       if(v <= array[new_index])
 	break;
