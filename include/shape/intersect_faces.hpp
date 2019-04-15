@@ -67,14 +67,14 @@ static constexpr std::array<std::bitset<3>, 3> edge_masks = {0b101, 0b011,
 template <typename Mesh, typename PointMap, typename EdgeIntersectionMap,
           typename HalfedgeVertexMap, typename Point, typename Real,
           typename Graph, typename VertexAreaMap, typename EquivalentMap,
-          typename LevelMap, typename ArcListMap>
+          typename LevelMap, typename ArcListMap, typename Arc>
 void intersect_faces(const Mesh &mesh, const PointMap &point,
                      const EdgeIntersectionMap &intersections,
                      HalfedgeVertexMap &to_halfedge,
                      HalfedgeVertexMap &from_halfedge, const Point &origin,
                      const Real min_distance, const Real step, Graph &graph,
                      VertexAreaMap &area, EquivalentMap &equivalent,
-                     LevelMap &edge_level, ArcListMap &arc_list) {
+                     LevelMap &edge_level, ArcListMap &arc_list, std::vector<Arc> &arc_out) {
   using std::array;
   using std::move;
   using std::optional;
@@ -91,8 +91,11 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
   using iterator =
       typename property_traits<EdgeIntersectionMap>::value_type::const_iterator;
   using GraphVertex = typename graph_traits<Graph>::vertex_descriptor;
+  //using Arc = typename ArcVector::value_type;
   using ArcList = typename property_traits<ArcListMap>::value_type;
-  using Arc = typename ArcList::value_type;
+  //using Arc = typename ArcList::value_type;
+
+  //typename ArcList::value_type arc_index = 0;
 
   for (const auto face : faces(mesh)) {
     // get random access to a few things around the face
@@ -153,8 +156,9 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
       const auto base = normalize(face_plane.base1()) * sqrt(circle.squared_radius());
       const auto p1 = face_center + base;
       const auto p2 = face_center - base;
-      const ArcList arcs{Arc(face_center, p1, p2, face_normal), Arc(face_center, p2, p1, face_normal)};
-      put(arc_list, new_edge, arcs);
+      put(arc_list, new_edge, ArcList{arc_out.size(), arc_out.size() + 1});
+      arc_out.emplace_back(face_center, p1, p2, face_normal);
+      arc_out.emplace_back(face_center, p2, p1, face_normal);
     }
 
     previous_covers.push_back(0b111);
@@ -222,7 +226,9 @@ void intersect_faces(const Mesh &mesh, const PointMap &point,
 
             const auto new_edge = add_edge(previous_vertices[p], current_vertices[c], graph).first;
 	    put(edge_level, new_edge, level);
-	    put(arc_list, new_edge, ArcList{Arc(face_center, current_arcs.at(c).first, current_arcs.at(c).second, face_normal)});
+
+	    put(arc_list, new_edge, ArcList{arc_out.size()});
+	    arc_out.emplace_back(face_center, current_arcs.at(c).first, current_arcs.at(c).second, face_normal);
 
             if (previous_edges.empty() ||
                 previous_edges.at(p).first != current_edges.at(c).first)

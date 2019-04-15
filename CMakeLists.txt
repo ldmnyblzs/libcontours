@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.9)
 project(SHAPE)
 set (CMAKE_CXX_STANDARD 17)
 
+option(BUILD_EXAMPLES "Build examples" ON)
+
 find_package(CGAL REQUIRED)
 find_package(Boost REQUIRED)
-find_package(bliss REQUIRED)
+find_package(bliss)
 
 include(GNUInstallDirs)
 add_library(shape INTERFACE)
@@ -23,4 +25,6 @@ install(TARGETS shape
 install(EXPORT shapeConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/shape)
 export(EXPORT shapeConfig)
 
-add_subdirectory(example)
+if(BUILD_EXAMPLES)
+  add_subdirectory(example)
+endif(BUILD_EXAMPLES)

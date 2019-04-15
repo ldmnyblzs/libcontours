@@ -53,6 +53,9 @@ struct Arc {
   Point source;
   Point target;
   Vector normal;
+  std::list<Arc>::const_iterator prev;
+  std::vector<std::list<Arc>::const_iterator> next;
+  std::list<Arc>::const_iterator left, right;
   Arc(Point center, Point source, Point target, Vector normal) :
     center(std::move(center)),
     source(std::move(source)),
@@ -108,6 +111,11 @@ int main(int argc, char **argv) {
                          to_halfedge, from_halfedge, origin, min_distance, step,
                          graph, area_map, eq_map, edge_level, arc_list);
 
+  for (const auto &edge : boost::make_iterator_range(boost::edges(graph))) {
+    if (boost::in_degree(boost::source(edge, graph), graph) > 0)
+      graph[edge].arcs.front().prev = graph[*boost::begin(boost::in_edges(boost::source(edge, graph), graph))].arcs.cbegin();
+  }
+
   auto visited_map = boost::get(&VertexProperty::visited, graph);
   shape::merge_equal_vertices(graph, eq_map, area_map, visited_map, arc_list);
 
@@ -140,7 +148,7 @@ int main(int argc, char **argv) {
   shape::mark_inside(graph, stable_vertices, stable_edges, visited_map);
   shape::mark_inside(reverse, unstable_vertices, unstable_edges, visited_map);
 
-  edge_level = boost::get(&EdgeProperty::level, graph);
+  //edge_level = boost::get(&EdgeProperty::level, graph);
   auto vertex_level = boost::get(&VertexProperty::level, graph);
   shape::make_reeb(graph, visited_map, edge_level, vertex_level);
   auto vertex_index = boost::get(&VertexProperty::id, graph);
