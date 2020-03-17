@@ -13,7 +13,7 @@
 #include <optional>
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 template <typename Point, typename Vector>
 static auto arc_area(const Point &source, const Point &target,
                      const Vector &normal, const Point &center) {

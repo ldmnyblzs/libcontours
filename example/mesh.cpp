@@ -10,15 +10,15 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <iostream>
 
-#include "shape/discover_graph.hpp"
-#include "shape/find_equilibra.hpp"
-#include "shape/intersect_faces.hpp"
-#include "shape/intersect_halfedges.hpp"
-#include "shape/merge_equal_vertices.hpp"
-#include "shape/mesh_properties.hpp"
-#include "shape/stl_io.hpp"
-#include "shape/make_reeb.hpp"
-#include "shape/encode_graph.hpp"
+#include "contours/discover_graph.hpp"
+#include "contours/find_equilibra.hpp"
+#include "contours/intersect_faces.hpp"
+#include "contours/intersect_halfedges.hpp"
+#include "contours/merge_equal_vertices.hpp"
+#include "contours/mesh_properties.hpp"
+#include "contours/stl_io.hpp"
+#include "contours/make_reeb.hpp"
+#include "contours/encode_graph.hpp"
 
 using Kernel = CGAL::Simple_cartesian<double>;
 using Point = Kernel::Point_3;
@@ -73,15 +73,15 @@ int main(int argc, char **argv) {
   Graph graph;
 
   const boost::iostreams::mapped_file_source file(argv[1]);
-  shape::read_STL(file.begin(), file.end(), mesh, mesh.points());
+  contours::read_STL(file.begin(), file.end(), mesh, mesh.points());
   const int count = atoi(argv[2]);
   const double ratio = atof(argv[3]);
 
   const Point origin =
       CGAL::centroid(mesh.points().begin(), mesh.points().end());
-  const double area = shape::surface_area(mesh, mesh.points());
-  const double max_distance = shape::max_distance(mesh, mesh.points(), origin);
-  const double min_distance = shape::min_distance(mesh, mesh.points(), origin);
+  const double area = contours::surface_area(mesh, mesh.points());
+  const double max_distance = contours::max_distance(mesh, mesh.points(), origin);
+  const double min_distance = contours::min_distance(mesh, mesh.points(), origin);
   const double step = (max_distance - min_distance) / (count + 1);
 
   auto halfedge_intersections =
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
               "h:intersections")
           .first;
 
-  shape::intersect_halfedges(mesh, mesh.points(), origin, min_distance, step,
+  contours::intersect_halfedges(mesh, mesh.points(), origin, min_distance, step,
                              halfedge_intersections);
 
   auto to_halfedge =
@@ -104,31 +104,31 @@ int main(int argc, char **argv) {
   auto eq_map = boost::get(&VertexProperty::eq_edges, graph);
   auto edge_level = boost::get(&EdgeProperty::level, graph);
   auto arc_list = boost::get(&EdgeProperty::arcs, graph);
-  shape::intersect_faces(mesh, mesh.points(), halfedge_intersections,
+  contours::intersect_faces(mesh, mesh.points(), halfedge_intersections,
                          to_halfedge, from_halfedge, origin, min_distance, step,
                          graph, area_map, eq_map, edge_level, arc_list);
 
   auto visited_map = boost::get(&VertexProperty::visited, graph);
-  shape::merge_equal_vertices(graph, eq_map, area_map, visited_map, arc_list);
+  contours::merge_equal_vertices(graph, eq_map, area_map, visited_map, arc_list);
 
   auto area_inside_map = boost::get(&EdgeProperty::area_inside, graph);
   auto roots_inside_map = boost::get(&EdgeProperty::roots_inside, graph);
   std::vector<GraphVertex> stable_vertices, unstable_vertices;
-  shape::discover_graph(graph, area_map, area_inside_map, roots_inside_map,
+  contours::discover_graph(graph, area_map, area_inside_map, roots_inside_map,
                         std::back_inserter(stable_vertices));
 
   auto reverse = make_reverse_graph(graph);
   auto area_outside_map = boost::get(&EdgeProperty::area_outside, reverse);
   auto roots_outside_map = boost::get(&EdgeProperty::roots_outside, reverse);
-  shape::discover_graph(reverse, area_map, area_outside_map, roots_outside_map,
+  contours::discover_graph(reverse, area_map, area_outside_map, roots_outside_map,
                         std::back_inserter(unstable_vertices));
 
   std::vector<GraphEdge> stable_edges;
   std::vector<ReverseEdge> unstable_edges;
-  shape::find_equilibria(graph, stable_vertices, area_inside_map,
+  contours::find_equilibria(graph, stable_vertices, area_inside_map,
                          roots_inside_map, std::back_inserter(stable_edges),
                          area * ratio);
-  shape::find_equilibria(reverse, unstable_vertices, area_outside_map,
+  contours::find_equilibria(reverse, unstable_vertices, area_outside_map,
                          roots_outside_map,
                          std::back_inserter(unstable_edges),
                          area * ratio);
@@ -137,19 +137,19 @@ int main(int argc, char **argv) {
   for (const auto vertex : boost::make_iterator_range(boost::vertices(graph)))
     graph[vertex].visited = false;
   
-  shape::mark_inside(graph, stable_vertices, stable_edges, visited_map);
-  shape::mark_inside(reverse, unstable_vertices, unstable_edges, visited_map);
+  contours::mark_inside(graph, stable_vertices, stable_edges, visited_map);
+  contours::mark_inside(reverse, unstable_vertices, unstable_edges, visited_map);
 
   edge_level = boost::get(&EdgeProperty::level, graph);
   auto vertex_level = boost::get(&VertexProperty::level, graph);
-  shape::make_reeb(graph, visited_map, edge_level, vertex_level);
+  contours::make_reeb(graph, visited_map, edge_level, vertex_level);
   auto vertex_index = boost::get(&VertexProperty::id, graph);
   int ind = 0;
   for (const auto vertex : boost::make_iterator_range(boost::vertices(graph)))
     graph[vertex].id = ind++;
   auto vertex_label = boost::get(&VertexProperty::label, graph);
-  shape::reeb_encode(graph, vertex_index, vertex_label);
-  std::cout << "Reeb: " << shape::encode(graph, vertex_label) << '\n';
+  contours::reeb_encode(graph, vertex_index, vertex_label);
+  std::cout << "Reeb: " << contours::encode(graph, vertex_label) << '\n';
 
   std::ofstream graph_file("out.dot");
   boost::write_graphviz(
@@ -159,6 +159,6 @@ int main(int argc, char **argv) {
       boost::default_writer(),
       get(&VertexProperty::id, graph));
   
-  if (shape::make_morse(graph, vertex_level, vertex_label))
-    std::cout << "Morse: " << shape::encode(graph, vertex_label) << '\n';
+  if (contours::make_morse(graph, vertex_level, vertex_label))
+    std::cout << "Morse: " << contours::encode(graph, vertex_label) << '\n';
 }

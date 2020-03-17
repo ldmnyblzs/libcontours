@@ -9,7 +9,7 @@
 #include <boost/range/algorithm/find.hpp>
 #include <boost/property_map/property_map.hpp>
 
-namespace shape {
+namespace contours {
   template <typename Graph, typename ArcListMap, typename EdgeProperty>
 static void
 add_edge_unique(const typename boost::graph_traits<Graph>::vertex_descriptor &source,

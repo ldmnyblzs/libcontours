@@ -8,7 +8,7 @@
 
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 template <typename Mesh, typename PointMap, typename Point, typename Real,
           typename HalfedgeIntersectionMap>
 void intersect_halfedges(const Mesh &mesh, const PointMap &point,

@@ -8,7 +8,7 @@
 #include <boost/graph/adjacency_iterator.hpp>
 #include <boost/range/join.hpp>
 
-namespace shape {
+namespace contours {
   template <typename Graph>
   auto every_adjacent(const typename boost::graph_traits<Graph>::vertex_descriptor vertex, const Graph &graph) {
     return boost::join(boost::adjacent_vertices(vertex, graph), boost::inv_adjacent_vertices(vertex, graph));

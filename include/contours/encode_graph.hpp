@@ -19,7 +19,7 @@
 
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 template <typename Graph, typename IndexMap>
 std::string encode(const Graph &graph, const IndexMap &index) {
   using namespace std;

@@ -12,7 +12,7 @@
 
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 template <typename Graph, typename AreaMap, typename Real>
 static std::optional<typename boost::graph_traits<Graph>::edge_descriptor>
 search_bigger(const Graph &graph,

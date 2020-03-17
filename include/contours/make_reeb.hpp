@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 
-namespace shape {
+namespace contours {
 template <typename Graph, typename Edges, typename RemoveMap>
 static void
 mark_to(Graph &graph,

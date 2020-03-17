@@ -11,7 +11,7 @@
 
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 
 template <typename PointMap>
 std::array<typename CGAL::Kernel_traits<

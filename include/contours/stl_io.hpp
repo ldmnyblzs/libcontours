@@ -24,7 +24,7 @@
 
 #define FL R"((\S+))"
 
-namespace shape {
+namespace contours {
 static const std::regex header(R"(solid.*)");
 static const std::regex facet(R"(\s*facet\s+normal\s+\S+\s+\S+\s+\S+)"
                               R"(\s*outer\s+loop)"

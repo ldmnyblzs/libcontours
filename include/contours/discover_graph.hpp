@@ -5,7 +5,7 @@
 #include <boost/graph/reverse_graph.hpp>
 #include <boost/property_map/property_map.hpp>
 
-namespace shape {
+namespace contours {
   template <typename Graph, typename VertexArea, typename EdgeArea, typename RootsMap>
 static void
 discover_from(const Graph &graph,

@@ -11,7 +11,7 @@
 
 #include "util.hpp"
 
-namespace shape {
+namespace contours {
 template <typename Mesh, typename PointMap, typename Point>
 auto max_distance(const Mesh &mesh, const PointMap &point,
                   const Point &origin) {
